@@ -51,15 +51,19 @@ const getFakeUser = () => {
 //     new Array(10).fill(null).map(getFakeUser)
 //   )
 // })
-
-server.get('/api/users', (req, res) => {
+const PAGE_SIZE = 10
+server.get('/api/users/:pageIndex', (req, res) => {
+  const { pageIndex } = req.params
   const fileName = `${__dirname}/tmp/date.json`
   fs.readFile(
     fileName,
     (err, data) => {
       if (!err) {
         return res.json(
-          JSON.parse(data)
+          JSON.parse(data).slice(
+            +pageIndex * PAGE_SIZE,
+            (+pageIndex + 1) * PAGE_SIZE
+          )
         )
       }
       const dataGenerated = new Array(100).fill(null).map(getFakeUser)
@@ -68,7 +72,10 @@ server.get('/api/users', (req, res) => {
         JSON.stringify(dataGenerated),
         () => {
           return res.json(
-            dataGenerated
+            dataGenerated.slice(
+              +pageIndex * PAGE_SIZE,
+              (+pageIndex + 1) * PAGE_SIZE
+            )
           )
         }
       )
